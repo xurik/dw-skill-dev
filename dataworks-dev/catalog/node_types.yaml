@@ -1,0 +1,348 @@
+# DataWorks Node Type Catalog
+# 受控枚举：runtime.command → 语言/引擎/内容格式/必填字段
+# 生成 FlowSpec 时只允许使用此目录中定义的节点类型
+# 如需新节点类型，先在 DataWorks 控制台创建并导出 Spec，再补充到此目录和 templates/
+
+# ──────────────────────────────────────────────
+# content_format 说明:
+#   plain_text  - script.content 是纯代码文本（SQL/Shell/Python）
+#   emr_json    - script.content 是 EmrCode JSON: {type, launcher, properties.arguments[0]}
+#   di_json     - script.content 是数据集成 JSON 配置（必须从控制台导出模板）
+#   controller  - 使用节点顶层特殊字段（branch/join/do-while/for-each/param-hub）
+#   spark_json  - script.content 是 OdpsSparkCode JSON + 资源引用前缀
+#   complex_json - 其他复杂 JSON（Flink/PAI 等，必须从控制台导出模板）
+#   none        - 无内容（虚拟节点等）
+# ──────────────────────────────────────────────
+
+node_types:
+
+  # ── MaxCompute (ODPS) ──
+  ODPS_SQL:
+    command: "ODPS_SQL"
+    engine: "MaxCompute"
+    language: "sql"
+    content_format: plain_text
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    optional_fields: [datasource.name, trigger, runtimeResource, inputs, outputs, recurrence, timeout, instanceMode, rerunMode]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name, runtimeResource.resourceGroup]
+    description: "MaxCompute SQL 节点，最常用的数据开发节点"
+
+  ODPS_SPARK_SQL:
+    command: "ODPS_SPARK_SQL"
+    engine: "MaxCompute"
+    language: "sql"
+    content_format: plain_text
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name]
+    description: "MaxCompute Spark SQL 节点"
+
+  ODPS_SQL_SCRIPT:
+    command: "ODPS_SQL_SCRIPT"
+    engine: "MaxCompute"
+    language: "sql"
+    content_format: plain_text
+    extension: ".ms"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path, trigger.cron]
+    description: "MaxCompute SQL Script，支持多条 SQL 编译执行"
+
+  PY_ODPS:
+    command: "PY_ODPS"
+    engine: "MaxCompute"
+    language: "python"
+    content_format: plain_text
+    extension: ".py"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name]
+    description: "PyODPS 2 节点，自带 MaxCompute 连接上下文"
+
+  PYODPS3:
+    command: "PYODPS3"
+    engine: "MaxCompute"
+    language: "python"
+    content_format: plain_text
+    extension: ".py"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name]
+    description: "PyODPS 3 节点"
+
+  ODPS_SPARK:
+    command: "ODPS_SPARK"
+    engine: "MaxCompute"
+    language: "json"
+    content_format: spark_json
+    extension: ".mc.spark.json"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.path, trigger.cron]
+    description: "MaxCompute Spark 节点，content 是资源引用+JSON 配置"
+    notes: "建议从控制台导出模板"
+
+  # ── Shell/脚本 ──
+  DIDE_SHELL:
+    command: "DIDE_SHELL"
+    engine: "General"
+    language: "shell"
+    content_format: plain_text
+    extension: ".sh"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path, trigger.cron, runtimeResource.resourceGroup]
+    description: "DataWorks Shell 节点，在资源组上执行"
+
+  PYTHON:
+    command: "PYTHON"
+    engine: "General"
+    language: "python"
+    content_format: plain_text
+    extension: ".py"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path, trigger.cron]
+    description: "Python 3 通用节点"
+
+  SSH:
+    command: "SSH"
+    engine: "General"
+    language: "shell"
+    content_format: plain_text
+    extension: ".ssh.sh"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path, trigger.cron]
+    description: "SSH 远程执行节点"
+
+  # ── EMR ──
+  EMR_HIVE:
+    command: "EMR_HIVE"
+    engine: "Hive"
+    language: "hive-sql"
+    content_format: emr_json
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, "properties.arguments[0]", script.path, trigger.cron]
+    description: "EMR Hive SQL 节点，content 是 EmrCode JSON"
+    notes: "实际 SQL 放在 content.properties.arguments[0]"
+
+  EMR_SPARK_SQL:
+    command: "EMR_SPARK_SQL"
+    engine: "Spark"
+    language: "sql"
+    content_format: emr_json
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, "properties.arguments[0]", script.path, trigger.cron]
+    description: "EMR Spark SQL 节点"
+
+  EMR_SHELL:
+    command: "EMR_SHELL"
+    engine: "Shell"
+    language: "shell"
+    content_format: emr_json
+    extension: ".sh"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, "properties.arguments[0]", script.path, trigger.cron]
+    description: "EMR Shell 节点"
+
+  EMR_SPARK:
+    command: "EMR_SPARK"
+    engine: "Spark"
+    language: "shell"
+    content_format: emr_json
+    extension: ".sh"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, "properties.arguments[0]", script.path, trigger.cron]
+    description: "EMR Spark 提交节点"
+
+  # ── Hologres ──
+  HOLOGRES_SQL:
+    command: "HOLOGRES_SQL"
+    engine: "Hologres"
+    language: "sql"
+    content_format: plain_text
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name]
+    description: "Hologres SQL 节点"
+
+  # ── 数据库 SQL ──
+  MySQL:
+    command: "MySQL"
+    engine: "MySQL"
+    language: "sql"
+    content_format: plain_text
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path, datasource.name]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name]
+    description: "MySQL SQL 节点"
+
+  POSTGRESQL:
+    command: "POSTGRESQL"
+    engine: "PostgreSQL"
+    language: "sql"
+    content_format: plain_text
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path, datasource.name]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name]
+    description: "PostgreSQL SQL 节点"
+
+  CLICK_SQL:
+    command: "CLICK_SQL"
+    engine: "ClickHouse"
+    language: "sql"
+    content_format: plain_text
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path, datasource.name]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name]
+    description: "ClickHouse SQL 节点"
+
+  StarRocks:
+    command: "StarRocks"
+    engine: "StarRocks"
+    language: "sql"
+    content_format: plain_text
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path, datasource.name]
+    user_fills: [name, script.content, script.path, trigger.cron, datasource.name]
+    description: "StarRocks SQL 节点"
+
+  # ── 数据集成（必须从控制台导出模板）──
+  DI:
+    command: "DI"
+    engine: "DataIntegration"
+    language: "json"
+    content_format: di_json
+    extension: ".json"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.path, trigger.cron]
+    description: "离线数据集成节点，content 是复杂 JSON 配置"
+    notes: "必须从 DataWorks 控制台导出模板，不要手写 content"
+
+  RI:
+    command: "RI"
+    engine: "DataIntegration"
+    language: "json"
+    content_format: di_json
+    extension: ".json"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.path]
+    description: "实时数据集成节点"
+    notes: "必须从控制台导出模板"
+
+  # ── 控制类节点 ──
+  VIRTUAL:
+    command: "VIRTUAL"
+    engine: "General"
+    language: ""
+    content_format: none
+    extension: ".vi"
+    required_fields: [name, script.runtime.command]
+    user_fills: [name]
+    description: "虚拟节点，仅用于建立依赖关系"
+
+  CONTROLLER_BRANCH:
+    command: "CONTROLLER_BRANCH"
+    engine: "General"
+    language: ""
+    content_format: controller
+    extension: ".branch.json"
+    required_fields: [name, script.runtime.command, branch.branches]
+    user_fills: [name, "branch.branches[].when", "branch.branches[].output"]
+    description: "分支节点，使用节点顶层 branch 字段"
+    special_field: "branch"
+
+  CONTROLLER_JOIN:
+    command: "CONTROLLER_JOIN"
+    engine: "General"
+    language: ""
+    content_format: controller
+    extension: ".join.json"
+    required_fields: [name, script.runtime.command, join.branches, join.logic]
+    user_fills: [name, "join.branches", "join.logic.expression"]
+    description: "汇聚节点，使用节点顶层 join 字段"
+    special_field: "join"
+
+  CONTROLLER_ASSIGNMENT:
+    command: "CONTROLLER_ASSIGNMENT"
+    engine: "General"
+    language: "odps"
+    content_format: plain_text
+    extension: ".assign.json"
+    required_fields: [name, script.content, script.runtime.command]
+    user_fills: [name, script.content]
+    description: "赋值节点，content 是 {language, content} JSON"
+    notes: "script.content 格式为 JSON: {\"language\": \"odps|python|shell\", \"content\": \"select 1\"}"
+
+  CONTROLLER_CYCLE:
+    command: "CONTROLLER_CYCLE"
+    engine: "General"
+    language: ""
+    content_format: controller
+    extension: ".do-while.json"
+    required_fields: [name, script.runtime.command, "do-while"]
+    user_fills: [name, "do-while.nodes", "do-while.while", "do-while.maxIterations"]
+    description: "循环节点 (do-while)，使用节点顶层 do-while 字段"
+    special_field: "do-while"
+
+  CONTROLLER_TRAVERSE:
+    command: "CONTROLLER_TRAVERSE"
+    engine: "General"
+    language: ""
+    content_format: controller
+    extension: ".for-each.json"
+    required_fields: [name, script.runtime.command, "for-each"]
+    user_fills: [name, "for-each.nodes", "for-each.flow"]
+    description: "遍历节点 (for-each)，使用节点顶层 for-each 字段"
+    special_field: "for-each"
+
+  PARAM_HUB:
+    command: "PARAM_HUB"
+    engine: "General"
+    language: ""
+    content_format: controller
+    extension: ".param-hub.json"
+    required_fields: [name, script.runtime.command, "param-hub.variables"]
+    user_fills: [name, "param-hub.variables"]
+    description: "参数节点，使用节点顶层 param-hub 字段"
+    special_field: "param-hub"
+
+  # ── 组件 ──
+  SQL_COMPONENT:
+    command: "SQL_COMPONENT"
+    engine: "MaxCompute"
+    language: "sql"
+    content_format: plain_text
+    extension: ".sql"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.content, script.path]
+    description: "SQL 组件节点"
+
+  # ── Flink（必须从控制台导出模板）──
+  FLINK_SQL_STREAM:
+    command: "FLINK_SQL_STREAM"
+    engine: "Flink"
+    language: "json"
+    content_format: complex_json
+    extension: ".json"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.path]
+    description: "Flink SQL 流处理节点"
+    notes: "建议从控制台导出模板"
+
+  FLINK_SQL_BATCH:
+    command: "FLINK_SQL_BATCH"
+    engine: "Flink"
+    language: "json"
+    content_format: complex_json
+    extension: ".json"
+    required_fields: [name, script.content, script.runtime.command, script.path]
+    user_fills: [name, script.path]
+    description: "Flink SQL 批处理节点"
+    notes: "建议从控制台导出模板"
+
+# ──────────────────────────────────────────────
+# 如何扩展此目录:
+# 1. 在 DataWorks 控制台创建目标类型的最小节点
+# 2. 点击"显示 Spec"导出完整 FlowSpec JSON
+# 3. 将导出的 JSON 保存到 templates/ 目录
+# 4. 在此文件中添加对应的节点类型定义
+# 5. 标注 user_fills（用户需要填写的业务字段）
+# ──────────────────────────────────────────────

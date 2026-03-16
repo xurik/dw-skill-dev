@@ -1,0 +1,15 @@
+{
+  "version": "1.1.0",
+  "kind": "CycleWorkflow",
+  "metadata": {
+    "owner": "{{owner_id}}",
+    "description": "{{workflow_description}}"
+  },
+  "spec": {
+    "nodes": [],
+    "scripts": [],
+    "triggers": [],
+    "runtimeResources": [],
+    "flow": []
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "skill_name": "dataworks-dev",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我有一个 MaxCompute 的订单表 ods_orders，需要每天凌晨3点做一个清洗任务，过滤掉金额为0的脏数据，输出到 dwd_orders 表。项目 ID 是 98765，数据源 odps_prod，资源组 S_res_group_abc_123，在上海 region。帮我创建这个节点。",
+      "expected_output": "AI should directly execute the DataWorks CreateNode API call (not generate a script file), and report the result like 'Node created: dwd_orders, ID: xxx'.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我要看一下项目 12345 里所有 dwd 层的节点有哪些，然后把它们全部发布到生产环境。发布完成后告诉我结果。region 是 cn-shanghai。",
+      "expected_output": "AI should directly list nodes, deploy them, and report results - not generate a script.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我要在项目 56789 建一个数据管道：第一步从原始日志表 raw_logs 抽取数据到 ods_logs，第二步清洗转换到 dwd_user_events，第三步聚合到 dws_daily_stats。三步串行依赖，每天早上6点跑。数据源 odps_first，资源组 S_res_group_xxx，上海 region。",
+      "expected_output": "AI should directly import the workflow via API and report results - not generate a script.",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "version": "1.1.0",
+  "kind": "Node",
+  "spec": {
+    "nodes": [
+      {
+        "recurrence": "Normal",
+        "timeout": 0,
+        "instanceMode": "T+1",
+        "rerunMode": "Allowed",
+        "rerunTimes": 3,
+        "rerunInterval": 180000,
+        "script": {
+          "path": "{{script_path}}",
+          "language": "shell",
+          "runtime": {
+            "command": "DIDE_SHELL"
+          },
+          "content": "{{shell_content}}",
+          "parameters": [
+            {
+              "name": "bizdate",
+              "artifactType": "Variable",
+              "scope": "NodeParameter",
+              "type": "System",
+              "value": "$[yyyymmdd-1]"
+            }
+          ]
+        },
+        "trigger": {
+          "type": "Scheduler",
+          "cron": "{{cron_expression}}",
+          "startTime": "1970-01-01 00:00:00",
+          "endTime": "9999-01-01 00:00:00",
+          "timezone": "Asia/Shanghai"
+        },
+        "runtimeResource": {
+          "resourceGroup": "{{resource_group}}"
+        },
+        "name": "{{node_name}}",
+        "inputs": {
+          "nodeOutputs": [
+            {
+              "data": "{{input_dependency}}",
+              "artifactType": "NodeOutput"
+            }
+          ]
+        },
+        "outputs": {
+          "nodeOutputs": [
+            {
+              "data": "{{output_name}}",
+              "artifactType": "NodeOutput"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
